@@ -1,0 +1,18 @@
+/* App.css */
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(249, 168, 212, 0.5); /* pink-300의 투명 버전 */
+  border-radius: 10px; /* 둥글게 굴려서 부동 느낌 가미 */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(244, 114, 182, 0.8); /* pink-400 */
+}
