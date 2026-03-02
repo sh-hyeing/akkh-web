@@ -22,7 +22,7 @@ export function useGuestbook() {
     // 메시지 추가 함수
     const addMessage = async (newName, newText, newPassword) => {
         if (isNaN(newPassword)) {
-            alert("비밀번호는 숫자만 입력 가능합니다.");
+            alert("비밀번호는 숫자만 입력 가능합니다");
             return;
         }
         const now = new Date()
