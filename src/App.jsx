@@ -4,9 +4,7 @@ import Rose from './components/Rose'
 import Bud from './components/Bud'
 import Sparkle from './components/Sparkle'
 import Letter from './components/Letter'
-
-import { db } from './firebase'
-import { collection, addDoc, query, orderBy, onSnapshot, doc, updateDoc, where } from "firebase/firestore"
+import { useGuestbook } from './hooks/useGuestbook'
 
 const NOISE = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E")`
 
@@ -15,51 +13,25 @@ export default function App() {
   const [isOpen, setIsOpen] = useState(false)
   const [sparkles, setSparkles] = useState([])
 
-  const [messages, setMessages] = useState([])
-  const [name, setName] = useState('')
-  const [text, setText] = useState('')
+  // 1. [교체] 복잡했던 모든 로직이 이 한 줄로 끝납니다!
+  const { messages, addMessage, editMessage, deleteMessage } = useGuestbook();
 
-  useEffect(() => {
-    const q = query(
-      collection(db, "guestbook"),
-      orderBy("id", "desc") // 일단 정렬만 먼저 해봅니다.
-    );
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const msgData = snapshot.docs.map(doc => ({
-        ...doc.data(),
-        docId: doc.id
-      }));
-
-      const visibleMessages = msgData.filter(msg => msg.isDeleted !== true);
-      setMessages(visibleMessages);
-    });
-
-    return () => unsubscribe();
-  }, []);
-
-  // 1. 화면 크기에 따른 스케일 비율 상태 추가
+  // 2. [유지] 화면 크기 조절 로직 (이건 아직 필요해요)
   const [scale, setScale] = useState(1)
-  // 2. 창 크기가 변할 때마다 가로/세로를 모두 고려하여 스케일 계산
   useEffect(() => {
     const handleResize = () => {
       const currentWidth = window.innerWidth
       const currentHeight = window.innerHeight
-
-      // 가로 비율 (봉투 너비 550px 기준)
       const scaleByWidth = (currentWidth - 40) / 550
-      // 세로 비율 (편지지가 솟아오르는 전체 높이 약 650px 기준)
       const scaleByHeight = (currentHeight - 60) / 650
-
       setScale(Math.min(1, scaleByWidth, scaleByHeight))
     }
-
     handleResize()
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
-
+  // 3. [유지] 스파클 효과 로직
   useEffect(() => {
     if (!isOpen) { setSparkles([]); return }
     const id = setInterval(() => {
@@ -70,71 +42,6 @@ export default function App() {
     }, 320)
     return () => clearInterval(id)
   }, [isOpen])
-
-  const handleAddMessage = async (newName, newText, newPassword) => {
-    // 숫자가 아니면 등록 거부
-    if (isNaN(newPassword)) {
-      alert("비밀번호는 숫자만 입력 가능합니다.");
-      return;
-    }
-
-    const now = new Date()
-    const date = `${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')}`
-
-    try {
-      await addDoc(collection(db, "guestbook"), {
-        id: Date.now(),
-        name: newName,
-        text: newText,
-        password: newPassword,
-        date: date,
-        isDeleted: false
-      });
-    } catch (e) {
-      console.error("Error adding document: ", e);
-    }
-  }
-
-  // 수정 함수
-  const onEditMessage = async (docId, originalPassword, currentText) => {
-    const inputPassword = prompt("비밀번호를 입력하세요 (숫자)");
-
-    if (inputPassword === String(originalPassword)) {
-      const newText = prompt("수정할 내용을 입력하세요", currentText);
-
-      if (newText && newText !== currentText) {
-        try {
-          await updateDoc(doc(db, "guestbook", docId), {
-            text: newText,
-            inputPassword: inputPassword
-          });
-          alert("수정되었습니다.");
-        } catch (e) {
-          console.error("수정 중 오류 발생: ", e);
-          alert("수정 권한이 없습니다.");
-        }
-      }
-    } else if (inputPassword !== null) {
-      alert("비밀번호가 일치하지 않습니다.");
-    }
-  }
-
-  // 삭제 함수 (숫자 체크 포함)
-  const onDeleteMessage = async (docId, originalPassword) => {
-    const inputPassword = prompt("비밀번호를 입력하세요.");
-
-    if (inputPassword) {
-      try {
-        await updateDoc(doc(db, "guestbook", docId), {
-          isDeleted: true,
-          inputPassword: inputPassword // 서버 규칙에서 대조할 값
-        });
-        alert("삭제되었습니다.");
-      } catch (e) {
-        alert("비밀번호가 일치하지 않습니다.");
-      }
-    }
-  }
 
   const W = 550, H = 380
   const cx = W / 2, cy = H / 2
@@ -200,12 +107,10 @@ export default function App() {
           <Letter
             isOpen={isOpen}
             messages={messages}
-            onAddMessage={handleAddMessage}
-            onDeleteMessage={onDeleteMessage}
-            onEditMessage={onEditMessage}
+            onAddMessage={addMessage}
+            onDeleteMessage={deleteMessage}
+            onEditMessage={editMessage}
           />
-
-          {/* 3. 봉투 앞면 — SVG 플랩으로 완벽한 스케일링 대응 */}
 
           {/* 오른쪽 플랩 (가장 아래) */}
           <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', zIndex: 19, pointerEvents: 'none', filter: 'drop-shadow(-1px 0 1px rgba(140,100,60,0.05))' }}>
@@ -222,13 +127,6 @@ export default function App() {
             <polygon points={`0,${H} ${cx},${cy} ${W},${H}`} fill="rgba(248, 238, 224, 0.97)" />
           </svg>
 
-          <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', zIndex: 18, pointerEvents: 'none' }}>
-            <line x1="0" y1="0" x2={cx} y2={cy} stroke="rgba(170,140,100,0.22)" strokeWidth="0.8" style={{ opacity: isOpen ? 0 : 1, transition: 'opacity 0.3s ease-out' }} />
-            <line x1={W} y1="0" x2={cx} y2={cy} stroke="rgba(170,140,100,0.22)" strokeWidth="0.8" style={{ opacity: isOpen ? 0 : 1, transition: 'opacity 0.3s ease-out' }} />
-            <line x1="0" y1={H} x2={cx} y2={cy} stroke="rgba(170,140,100,0.20)" strokeWidth="0.8" />
-            <line x1={W} y1={H} x2={cx} y2={cy} stroke="rgba(170,140,100,0.20)" strokeWidth="0.8" />
-          </svg>
-
           <div style={{
             position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
             zIndex: isOpen ? 19 : 24, pointerEvents: 'none',
@@ -237,8 +135,16 @@ export default function App() {
             transition: 'transform 0.55s cubic-bezier(0.22,1,0.36,1)',
             filter: 'drop-shadow(0 4px 5px rgba(140,100,60,0.12))',
           }}>
-            <svg style={{ width: '100%', height: '100%' }}>
-              <polygon points={`0,0 ${cx},${Math.round(cy * 1.52)} ${W},0`} fill="rgba(248, 238, 224, 0.97)" />
+            <svg style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}>
+
+              <path
+
+                d={`M 0 0 L ${cx - 80} ${Math.round(cy * 1.15)} C ${cx - 20} ${Math.round(cy * 1.52)}, ${cx + 20} ${Math.round(cy * 1.52)}, ${cx + 80} ${Math.round(cy * 1.15)} L ${W} 0`}
+
+                fill="rgba(248, 238, 224, 0.97)"
+
+              />
+
             </svg>
           </div>
 
@@ -246,8 +152,6 @@ export default function App() {
             position: 'absolute', inset: 0, width: '100%', height: '100%', zIndex: 25, pointerEvents: 'none',
             opacity: isOpen ? 0 : 1, transition: 'opacity 0.3s ease-out'
           }}>
-            <line x1="0" y1="0" x2={cx} y2={Math.round(cy * 1.52)} stroke="rgba(170,140,100,0.28)" strokeWidth="0.8" />
-            <line x1={W} y1="0" x2={cx} y2={Math.round(cy * 1.52)} stroke="rgba(170,140,100,0.28)" strokeWidth="0.8" />
           </svg>
 
         </div>
