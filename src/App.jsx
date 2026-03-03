@@ -1,22 +1,17 @@
 import { useState, useEffect } from 'react'
 import './App.css'
-import Rose from './components/Rose'
-import Bud from './components/Bud'
 import Sparkle from './components/Sparkle'
 import Letter from './components/Letter'
 import { useGuestbook } from './hooks/useGuestbook'
-
-const NOISE = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E")`
+import backgroundImage from "./assets/background2.jpg";
 
 export default function App() {
   const [currentMenu, setCurrentMenu] = useState('main')
   const [isOpen, setIsOpen] = useState(false)
   const [sparkles, setSparkles] = useState([])
 
-  // 1. [교체] 복잡했던 모든 로직이 이 한 줄로 끝납니다!
   const { messages, addMessage, editMessage, deleteMessage } = useGuestbook();
 
-  // 2. [유지] 화면 크기 조절 로직 (이건 아직 필요해요)
   const [scale, setScale] = useState(1)
   useEffect(() => {
     const handleResize = () => {
@@ -31,7 +26,6 @@ export default function App() {
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
-  // 3. [유지] 스파클 효과 로직
   useEffect(() => {
     if (!isOpen) { setSparkles([]); return }
     const id = setInterval(() => {
@@ -47,27 +41,33 @@ export default function App() {
   const cx = W / 2, cy = H / 2
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center p-4"
+
+    <div className="min-h-screen w-full flex items-center justify-center p-4 pb-[10vh] md:pb-0"
       style={{
-        background: 'radial-gradient(ellipse at 40% 40%, #fff0f3 0%, #fff8f9 40%, #f6eaec 100%)',
+        backgroundColor: '#ffffff',
         overflow: 'hidden',
         fontFamily: "'Georgia', 'Times New Roman', serif",
+        position: 'relative',
       }}
     >
-      {/* 배경 장미 장식 */}
-      <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', overflow: 'hidden', zIndex: 0 }}>
-        {[
-          { top: '15%', left: '18%', size: 52, op: 0.52, rot: -20 },
-          { top: '12%', right: '20%', size: 44, op: 0.50, rot: 30 },
-          { bottom: '16%', left: '22%', size: 48, op: 0.51, rot: 15 },
-          { bottom: '14%', right: '18%', size: 54, op: 0.53, rot: -10 },
-          { top: '45%', left: '12%', size: 38, op: 0.58, rot: 45 },
-          { top: '42%', right: '14%', size: 38, op: 0.58, rot: -45 },
-        ].map((r, i) => (
-          <div key={i} style={{ position: 'absolute', top: r.top, bottom: r.bottom, left: r.left, right: r.right }}>
-            <Rose size={r.size} opacity={r.op} rotate={r.rot} />
-          </div>
-        ))}
+      <div style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
+        <div style={{
+          position: 'absolute', inset: 0,
+          backgroundImage: `url(${backgroundImage})`,
+          backgroundSize: 'cover', backgroundPosition: 'center',
+          opacity: 0.4
+        }} />
+
+        {/* 2. 핑크-주황 그라데이션 (실크 위에 overlay) */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          background: 'linear-gradient(135deg, #fde9ff 0%, #ffbff2 50%, #ffffff 100%)',
+          mixBlendMode: 'overlay', opacity: 0.2
+        }} />
+
+        <div style={{
+          position: 'absolute', inset: 0,
+        }} />
       </div>
 
       {/* 봉투 래퍼 */}
@@ -82,24 +82,15 @@ export default function App() {
         onMouseEnter={() => setIsOpen(true)}
         onMouseLeave={() => setIsOpen(false)}
       >
-        {/* 스파클 오버레이 */}
-        <div style={{ position: 'absolute', inset: 0, zIndex: 50, pointerEvents: 'none', overflow: 'hidden' }}>
-          {sparkles.map(s => (
-            <div key={s.id} style={{ position: 'absolute', left: `${s.x}%`, top: `${s.y}%`, animation: 'sparkleFade 1.2s ease-out forwards' }}>
-              <Sparkle size={s.size} color="#dfc090" />
-            </div>
-          ))}
-        </div>
 
-        <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+        <div style={{ position: 'relative', width: '100%', height: '100%', filter: 'drop-shadow(0 20px 35px rgba(140, 100, 60, 0.20))' }}>
 
           {/* 1. 봉투 뒷면 */}
           <div style={{
             position: 'absolute', inset: 0,
-            background: 'rgba(248, 238, 224, 0.97)',
-            backgroundImage: NOISE,
+            background: '#ded6cb',
             backgroundBlendMode: 'multiply',
-            boxShadow: '0 12px 50px rgba(160,120,80,0.20), 0 2px 10px rgba(0,0,0,0.09)',
+            boxShadow: '0 12px 50px rgba(160,120,80,0.20), 0 4px 10px rgba(0,0,0,0.09)',
             zIndex: 10, transform: 'translateZ(0)',
           }}>
           </div>
@@ -114,17 +105,17 @@ export default function App() {
 
           {/* 오른쪽 플랩 (가장 아래) */}
           <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', zIndex: 19, pointerEvents: 'none', filter: 'drop-shadow(-1px 0 1px rgba(140,100,60,0.05))' }}>
-            <polygon points={`${W},0 ${cx},${cy} ${W},${H}`} fill="rgba(248, 238, 224, 0.97)" />
+            <polygon points={`${W},0 ${cx},${cy} ${W},${H}`} fill="#e4ddd3" />
           </svg>
 
           {/* 왼쪽 플랩 (오른쪽 덮음) */}
           <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', zIndex: 20, pointerEvents: 'none', filter: 'drop-shadow(3px 0 3px rgba(140,100,60,0.09))' }}>
-            <polygon points={`0,0 ${cx},${cy} 0,${H}`} fill="rgba(248, 238, 224, 0.97)" />
+            <polygon points={`0,0 ${cx},${cy} 0,${H}`} fill="#e4ddd3" />
           </svg>
 
           {/* 아래쪽 플랩 (양옆 덮음) */}
           <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', zIndex: 21, pointerEvents: 'none', filter: 'drop-shadow(0 -2px 3px rgba(140,100,60,0.11))' }}>
-            <polygon points={`0,${H} ${cx},${cy} ${W},${H}`} fill="rgba(248, 238, 224, 0.97)" />
+            <polygon points={`0,${H} ${cx},${cy} ${W},${H}`} fill="#e4ddd3" />
           </svg>
 
           <div style={{
@@ -141,7 +132,7 @@ export default function App() {
 
                 d={`M 0 0 L ${cx - 80} ${Math.round(cy * 1.15)} C ${cx - 20} ${Math.round(cy * 1.52)}, ${cx + 20} ${Math.round(cy * 1.52)}, ${cx + 80} ${Math.round(cy * 1.15)} L ${W} 0`}
 
-                fill="rgba(248, 238, 224, 0.97)"
+                fill="#e4ddd3"
 
               />
 

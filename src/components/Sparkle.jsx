@@ -1,4 +1,4 @@
-export default function Sparkle({ size = 12, color = '#e8c8b0', style: s = {} }) {
+export default function Sparkle({ size = 12, color = '#ffbaf0', style: s = {} }) {
     return (
         <svg width={size} height={size} viewBox="0 0 20 20"
             style={{ ...s, display: 'inline-block' }} xmlns="http://www.w3.org/2000/svg">
