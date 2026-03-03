@@ -89,6 +89,7 @@ export default function App() {
           <div style={{
             position: 'absolute', inset: 0,
             background: '#ded6cb',
+            border: '1px solid #5d40371d',
             backgroundBlendMode: 'multiply',
             boxShadow: '0 12px 50px rgba(160,120,80,0.20), 0 4px 10px rgba(0,0,0,0.09)',
             zIndex: 10, transform: 'translateZ(0)',
@@ -105,17 +106,17 @@ export default function App() {
 
           {/* 오른쪽 플랩 (가장 아래) */}
           <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', zIndex: 19, pointerEvents: 'none', filter: 'drop-shadow(-1px 0 1px rgba(140,100,60,0.05))' }}>
-            <polygon points={`${W},0 ${cx},${cy} ${W},${H}`} fill="#e4ddd3" />
+            <polygon points={`${W},0 ${cx},${cy} ${W},${H}`} fill="#e4ddd3" stroke="#5D4037" strokeWidth="1" strokeOpacity="0.15" />
           </svg>
 
           {/* 왼쪽 플랩 (오른쪽 덮음) */}
           <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', zIndex: 20, pointerEvents: 'none', filter: 'drop-shadow(3px 0 3px rgba(140,100,60,0.09))' }}>
-            <polygon points={`0,0 ${cx},${cy} 0,${H}`} fill="#e4ddd3" />
+            <polygon points={`0,0 ${cx},${cy} 0,${H}`} fill="#e4ddd3" stroke="#5D4037" strokeWidth="1" strokeOpacity="0.15" />
           </svg>
 
           {/* 아래쪽 플랩 (양옆 덮음) */}
           <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', zIndex: 21, pointerEvents: 'none', filter: 'drop-shadow(0 -2px 3px rgba(140,100,60,0.11))' }}>
-            <polygon points={`0,${H} ${cx},${cy} ${W},${H}`} fill="#e4ddd3" />
+            <polygon points={`0,${H} ${cx},${cy} ${W},${H}`} fill="#e4ddd3" stroke="#5D4037" strokeWidth="1" strokeOpacity="0.15" />
           </svg>
 
           <div style={{
@@ -133,6 +134,9 @@ export default function App() {
                 d={`M 0 0 L ${cx - 80} ${Math.round(cy * 1.15)} C ${cx - 20} ${Math.round(cy * 1.52)}, ${cx + 20} ${Math.round(cy * 1.52)}, ${cx + 80} ${Math.round(cy * 1.15)} L ${W} 0`}
 
                 fill="#e4ddd3"
+                stroke="#5D4037" // 테두리 색상
+                strokeWidth="1"
+                strokeOpacity="0.2"
 
               />
 
