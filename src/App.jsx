@@ -155,7 +155,7 @@ export default function App() {
       >
         <div style={{
           position: 'relative', width: '100%', height: '100%',
-          filter: 'drop-shadow(0 20px 35px rgba(140, 100, 60, 0.20))'
+          filter: 'drop-shadow(0 20px 35px rgba(72, 66, 72, 0.4))'
         }}>
           {/* 봉투 내부 구성 요소 */}
           <div style={{ position: 'relative', width: '100%', height: '100%' }}>
