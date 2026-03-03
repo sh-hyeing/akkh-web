@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import Rose from './Rose';
 import Bud from './Bud';
-import Sparkle from './Sparkle';
 
 export default function Letter({ isOpen, messages, onAddMessage, onDeleteMessage, onEditMessage }) {
     const [currentMenu, setCurrentMenu] = useState('main');
@@ -56,7 +55,7 @@ export default function Letter({ isOpen, messages, onAddMessage, onDeleteMessage
 
                 <div className="flex justify-between items-center mb-2 pb-1">
                     <span style={{ color: '#b09070', fontSize: '10px', fontWeight: 'bold', letterSpacing: '4px' }}>AKKH</span>
-                    <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}><Sparkle size={8} color="#d4a8b0" /><span style={{ fontSize: '14px', opacity: 0.6 }}>✉</span><Sparkle size={8} color="#d4a8b0" /></div>
+                    <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}><span style={{ fontSize: '14px', opacity: 0.6 }}>✉</span></div>
                 </div>
 
                 <div className="flex gap-5 mb-2" style={{ fontSize: '10.5px', fontWeight: 'bold', letterSpacing: '1px' }}>
@@ -95,7 +94,7 @@ export default function Letter({ isOpen, messages, onAddMessage, onDeleteMessage
                     {currentMenu === 'guest' && (
                         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
 
-                            {/* ✨ 1. 메시지 리스트 영역 (남은 공간을 다 차지하며, 글이 많아지면 스크롤 생김) ✨ */}
+                            {/* 1. 메시지 리스트 영역  */}
                             <div style={{ flex: 1, overflowY: 'auto', paddingRight: '4px' }}>
                                 {messages.length === 0 ? (
                                     <p style={{ textAlign: 'center', color: '#a89f91', fontSize: '13px', marginTop: '40px', fontStyle: 'italic' }}>
@@ -109,12 +108,13 @@ export default function Letter({ isOpen, messages, onAddMessage, onDeleteMessage
                                                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                                                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                                         <b style={{ color: '#9e7b5a' }}>{msg.name}</b>
-                                                        <div style={{ display: 'flex', gap: '5px' }}>
-                                                            <button onClick={(e) => { e.stopPropagation(); onEditMessage(msg.docId, msg.password, msg.text); }} style={{ background: 'none', border: 'none', color: '#c4bcae', cursor: 'pointer', fontSize: '10px' }}>수정</button>
-                                                            <button onClick={(e) => { e.stopPropagation(); onDeleteMessage(msg.docId, msg.password); }} style={{ background: 'none', border: 'none', color: '#c4bcae', cursor: 'pointer', fontSize: '10px' }}>삭제</button>
-                                                        </div>
+                                                        <span style={{ color: '#c4bcae', fontSize: '11px' }}>{msg.date}</span>
+
                                                     </div>
-                                                    <span style={{ color: '#c4bcae', fontSize: '11px' }}>{msg.date}</span>
+                                                    <div style={{ display: 'flex', gap: '5px' }}>
+                                                        <button onClick={(e) => { e.stopPropagation(); onEditMessage(msg.docId, msg.password, msg.text); }} style={{ background: 'none', border: 'none', color: '#c4bcae', cursor: 'pointer', fontSize: '10px' }}>수정</button>
+                                                        <button onClick={(e) => { e.stopPropagation(); onDeleteMessage(msg.docId, msg.password); }} style={{ background: 'none', border: 'none', color: '#c4bcae', cursor: 'pointer', fontSize: '10px' }}>삭제</button>
+                                                    </div>
                                                 </div>
                                                 <p style={{ margin: '4px 0 0', color: '#6b5e50', lineHeight: '1.6' }}>{msg.text}</p>
                                             </div>
@@ -123,7 +123,7 @@ export default function Letter({ isOpen, messages, onAddMessage, onDeleteMessage
                                 )}
                             </div>
 
-                            {/* ✨ 2. 페이지 번호 영역 (메시지 개수와 상관없이 항상 이 위치에 고정) ✨ */}
+                            {/* 2. 페이지 번호 영역 */}
                             <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', padding: '15px 0 10px 0' }}>
                                 {messages.length > postsPerPage && Array.from({ length: totalPages }, (_, i) => i + 1).map(pageNum => (
                                     <button
@@ -141,7 +141,7 @@ export default function Letter({ isOpen, messages, onAddMessage, onDeleteMessage
                                 ))}
                             </div>
 
-                            {/* ✨ 3. 입력 폼 영역 (최하단 고정) ✨ */}
+                            {/* 3. 입력 폼 영역 (최하단 고정) */}
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '10px 12px', background: 'rgba(240,228,210,0.28)', border: '1px solid rgba(200,178,148,0.28)', borderRadius: '2px' }}>
                                 <div style={{ display: 'flex', gap: '5px' }}>
                                     <input value={name} onChange={e => setName(e.target.value)} placeholder="Name" style={{ flex: 1, background: 'transparent', border: 'none', borderBottom: '1px solid #d4bfa0', fontSize: '12px', outline: 'none', padding: '4px 2px', color: '#4a3f33' }} />

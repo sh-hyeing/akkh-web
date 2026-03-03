@@ -1,118 +1,126 @@
 import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'; // Framer Motion 추가
 import './App.css'
-import Sparkle from './components/Sparkle'
+import { RightFlap, LeftFlap, BottomFlap, TopFlap } from './components/EnvelopeFlaps';
 import Letter from './components/Letter'
 import { useGuestbook } from './hooks/useGuestbook'
 import backgroundImage from "./assets/background2.jpg";
 import RibbonLoader from './components/RibbonLoader'
 
 export default function App() {
-  const [currentMenu, setCurrentMenu] = useState('main')
+  const ENVELOPE_CONF = {
+    WIDTH: 550,
+    HEIGHT: 380,
+    PADDING_X: 40,
+    PADDING_Y: 60,
+    SCALE_BASE_HEIGHT: 650,
+    SPARKLE_INTERVAL: 320,
+    LOADER_TIMEOUT: 5000,
+    COLORS: {
+      BG_MAIN: '#f6f1eb',
+      ENVELOPE_BACK: '#ded6cb',
+      ENVELOPE_FLAP: '#e4ddd3',
+      STROKE: '#5D4037',
+      SHADOW: 'rgba(140, 100, 60, 0.20)',
+    },
+    Z_INDEX: {
+      LOADER: 50,
+      ENVELOPE_WRAP: 1,
+      ENVELOPE_BACK: 10,
+      LETTER: 15,
+      FLAP_RIGHT: 19,
+      FLAP_LEFT: 20,
+      FLAP_BOTTOM: 21,
+      FLAP_TOP: 24,
+    }
+  };
+
+  const { WIDTH: W, HEIGHT: H, COLORS, Z_INDEX, PADDING_X, PADDING_Y, SCALE_BASE_HEIGHT } = ENVELOPE_CONF;
+  const cx = W / 2;
+  const cy = H / 2;
+
   const [isOpen, setIsOpen] = useState(false)
-  const [sparkles, setSparkles] = useState([])
-
   const { messages, addMessage, editMessage, deleteMessage } = useGuestbook();
-
   const [scale, setScale] = useState(1)
+  const [progress, setProgress] = useState(0)
+  const [appReady, setAppReady] = useState(false)
+
+  // 반응형 스케일 계산
   useEffect(() => {
     const handleResize = () => {
       const currentWidth = window.innerWidth
       const currentHeight = window.innerHeight
-      const scaleByWidth = (currentWidth - 40) / 550
-      const scaleByHeight = (currentHeight - 60) / 650
+      const scaleByWidth = (currentWidth - PADDING_X) / W;
+      const scaleByHeight = (currentHeight - PADDING_Y) / SCALE_BASE_HEIGHT;
       setScale(Math.min(1, scaleByWidth, scaleByHeight))
     }
     handleResize()
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
-  }, [])
+  }, [W, PADDING_X, PADDING_Y, SCALE_BASE_HEIGHT])
 
-  useEffect(() => {
-    if (!isOpen) { setSparkles([]); return }
-    const id = setInterval(() => {
-      setSparkles(prev => [
-        ...prev.slice(-8),
-        { id: Date.now(), x: Math.random() * 100, y: Math.random() * 100, size: 8 + Math.random() * 10 }
-      ])
-    }, 320)
-    return () => clearInterval(id)
-  }, [isOpen])
-
-  const W = 550, H = 380
-  const cx = W / 2, cy = H / 2
-
-  const [progress, setProgress] = useState(0)
-  const [appReady, setAppReady] = useState(false)
-
+  // 로딩 및 이미지 프리로드 로직
   useEffect(() => {
     let isMounted = true;
-
     const img = new Image()
     img.src = backgroundImage
 
-    const forceShow = setTimeout(() => {
+    const finishLoading = () => {
       if (isMounted) setAppReady(true);
-    }, 5000);
+    };
+
+    const forceShow = setTimeout(finishLoading, ENVELOPE_CONF.LOADER_TIMEOUT);
 
     const timer = setInterval(() => {
       setProgress(prev => {
         if (prev >= 100) {
           clearInterval(timer)
+          if (img.complete) finishLoading();
           return 100
         }
-        const increment = prev > 90 ? 1 : Math.floor(Math.random() * 10 + 2);
-        return prev + increment
+        return prev + (prev > 90 ? 1 : Math.floor(Math.random() * 10 + 2));
       })
     }, 100)
 
     img.onload = () => {
-      const checkInterval = setInterval(() => {
-        if (progress >= 100) {
-          clearInterval(checkInterval);
-          clearTimeout(forceShow);
-          if (isMounted) setAppReady(true);
-        }
-      }, 100);
+      if (progress >= 100) finishLoading();
     }
-
-    img.onerror = () => {
-      console.error("배경 이미지를 불러오지 못했습니다. 경로를 확인해주세요.");
-      setAppReady(true);
-    };
 
     return () => {
       isMounted = false;
       clearInterval(timer);
       clearTimeout(forceShow);
     }
-  }, [progress, backgroundImage])
+  }, [backgroundImage, progress, ENVELOPE_CONF.LOADER_TIMEOUT])
 
   return (
-
+    /* 최상위 부모 div: 전체 화면을 감싸 에러를 방지합니다. */
     <div className="min-h-screen w-full flex items-center justify-center p-4 pb-[10vh] md:pb-0"
       style={{
-        backgroundColor: '#f6f1eb',
+        backgroundColor: COLORS.BG_MAIN,
         overflow: 'hidden',
         fontFamily: "'Georgia', 'Times New Roman', serif",
         position: 'relative',
       }}
     >
-      <div style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 50,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: '#ffffff',
-        opacity: appReady ? 0 : 1,
-        visibility: appReady ? 'hidden' : 'visible',
-        transition: 'opacity 0.8s ease-in-out, visibility 0.8s ease-in-out',
-        pointerEvents: appReady ? 'none' : 'auto'
-      }}>
-        <RibbonLoader progress={progress > 100 ? 100 : progress} />
-      </div>
+      {/* 1. 로딩 화면 (Framer Motion 적용) */}
+      <AnimatePresence>
+        {!appReady && (
+          <motion.div
+            key="loader"
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8 }}
+            style={{
+              position: 'fixed', inset: 0, zIndex: Z_INDEX.LOADER,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              backgroundColor: '#ffffff',
+            }}>
+            <RibbonLoader progress={progress > 100 ? 100 : progress} />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
+      {/* 2. 배경 레이어 */}
       <div style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
         <div style={{
           position: 'absolute', inset: 0,
@@ -120,108 +128,58 @@ export default function App() {
           backgroundSize: 'cover', backgroundPosition: 'center',
           opacity: 0.4
         }} />
-
-        {/* 2. 핑크-주황 그라데이션 */}
         <div style={{
           position: 'absolute', inset: 0,
           background: 'linear-gradient(135deg, #fde9ff 0%, #ffbff2 50%, #ffffff 100%)',
           mixBlendMode: 'overlay', opacity: 0.2
         }} />
-
-        <div style={{
-          position: 'absolute', inset: 0,
-        }} />
       </div>
 
-      {/* 봉투 래퍼 */}
-      <div
+      {/* 3. 메인 봉투 (Framer Motion 적용) */}
+      <motion.div
+        onMouseEnter={() => setIsOpen(true)}
+        onMouseLeave={() => setIsOpen(false)}
+        animate={{ scale: scale }}
+        transition={{ type: "spring", stiffness: 260, damping: 25 }}
         style={{
-          position: 'relative', width: `${W}px`, height: `${H}px`, zIndex: 1, cursor: 'pointer',
-          transform: `perspective(1200px) scale(${scale})`,
+          position: 'relative',
+          width: `${W}px`,
+          height: `${H}px`,
+          zIndex: Z_INDEX.ENVELOPE_WRAP,
+          cursor: 'pointer',
+          perspective: '1200px',
           transformStyle: 'preserve-3d',
           transformOrigin: 'center center',
           flexShrink: 0
         }}
-        onMouseEnter={() => setIsOpen(true)}
-        onMouseLeave={() => setIsOpen(false)}
       >
+        <div style={{
+          position: 'relative', width: '100%', height: '100%',
+          filter: 'drop-shadow(0 20px 35px rgba(140, 100, 60, 0.20))'
+        }}>
+          {/* 봉투 내부 구성 요소 */}
+          <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+            <div style={{
+              position: 'absolute', inset: 0,
+              background: COLORS.ENVELOPE_BACK,
+              zIndex: Z_INDEX.ENVELOPE_BACK
+            }} />
 
-        <div style={{ position: 'relative', width: '100%', height: '100%', filter: 'drop-shadow(0 20px 35px rgba(140, 100, 60, 0.20))' }}>
+            <Letter
+              isOpen={isOpen}
+              messages={messages}
+              onAddMessage={addMessage}
+              onDeleteMessage={deleteMessage}
+              onEditMessage={editMessage}
+            />
 
-          {/* 1. 봉투 뒷면 */}
-          <div style={{
-            position: 'absolute', inset: 0,
-            background: '#ded6cb',
-            border: '1px solid #5d40371d',
-            backgroundBlendMode: 'multiply',
-            boxShadow: '0 12px 50px rgba(160,120,80,0.20), 0 4px 10px rgba(0,0,0,0.09)',
-            zIndex: 10, transform: 'translateZ(0)',
-          }}>
+            <RightFlap W={W} H={H} cx={cx} cy={cy} color={COLORS.ENVELOPE_FLAP} zIndex={Z_INDEX.FLAP_RIGHT} />
+            <LeftFlap W={W} H={H} cx={cx} cy={cy} color={COLORS.ENVELOPE_FLAP} zIndex={Z_INDEX.FLAP_LEFT} />
+            <BottomFlap W={W} H={H} cx={cx} cy={cy} color={COLORS.ENVELOPE_FLAP} zIndex={Z_INDEX.FLAP_BOTTOM} />
+            <TopFlap W={W} cx={cx} cy={cy} color={COLORS.ENVELOPE_FLAP} zIndex={Z_INDEX.FLAP_TOP} isOpen={isOpen} />
           </div>
-
-          <Letter
-            isOpen={isOpen}
-            messages={messages}
-            onAddMessage={addMessage}
-            onDeleteMessage={deleteMessage}
-            onEditMessage={editMessage}
-          />
-
-          {/* 오른쪽 플랩 (가장 아래) */}
-          <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', zIndex: 19, pointerEvents: 'none', filter: 'drop-shadow(-1px 0 1px rgba(140,100,60,0.05))' }}>
-            <polygon points={`${W},0 ${cx},${cy} ${W},${H}`} fill="#e4ddd3" stroke="#5D4037" strokeWidth="1" strokeOpacity="0.15" />
-          </svg>
-
-          {/* 왼쪽 플랩 (오른쪽 덮음) */}
-          <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', zIndex: 20, pointerEvents: 'none', filter: 'drop-shadow(3px 0 3px rgba(140,100,60,0.09))' }}>
-            <polygon points={`0,0 ${cx},${cy} 0,${H}`} fill="#e4ddd3" stroke="#5D4037" strokeWidth="1" strokeOpacity="0.15" />
-          </svg>
-
-          {/* 아래쪽 플랩 (양옆 덮음) */}
-          <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', zIndex: 21, pointerEvents: 'none', filter: 'drop-shadow(0 -2px 3px rgba(140,100,60,0.11))' }}>
-            <polygon points={`0,${H} ${cx},${cy} ${W},${H}`} fill="#e4ddd3" stroke="#5D4037" strokeWidth="1" strokeOpacity="0.15" />
-          </svg>
-
-          <div style={{
-            position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
-            zIndex: isOpen ? 19 : 24, pointerEvents: 'none',
-            transformOrigin: 'top center',
-            transform: isOpen ? 'rotateX(165deg)' : 'rotateX(0deg)',
-            transition: 'transform 0.55s cubic-bezier(0.22,1,0.36,1)',
-            filter: 'drop-shadow(0 4px 5px rgba(140,100,60,0.12))',
-          }}>
-            <svg style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}>
-
-              <path
-
-                d={`M 0 0 L ${cx - 80} ${Math.round(cy * 1.15)} C ${cx - 20} ${Math.round(cy * 1.52)}, ${cx + 20} ${Math.round(cy * 1.52)}, ${cx + 80} ${Math.round(cy * 1.15)} L ${W} 0`}
-
-                fill="#e4ddd3"
-                stroke="#5D4037"
-                strokeWidth="1"
-                strokeOpacity="0.2"
-
-              />
-
-            </svg>
-          </div>
-
-          <svg style={{
-            position: 'absolute', inset: 0, width: '100%', height: '100%', zIndex: 25, pointerEvents: 'none',
-            opacity: isOpen ? 0 : 1, transition: 'opacity 0.3s ease-out'
-          }}>
-          </svg>
-
         </div>
-      </div>
-
-      <style>{`
-        @keyframes sparkleFade {
-          0%   { opacity: 0; transform: scale(0.5) rotate(0deg); }
-          40%  { opacity: 1; transform: scale(1.2) rotate(20deg); }
-          100% { opacity: 0; transform: scale(0.8) rotate(45deg); }
-        }
-      `}</style>
+      </motion.div>
     </div>
   )
 }
