@@ -4,6 +4,7 @@ import Sparkle from './components/Sparkle'
 import Letter from './components/Letter'
 import { useGuestbook } from './hooks/useGuestbook'
 import backgroundImage from "./assets/background2.jpg";
+import RibbonLoader from './components/RibbonLoader'
 
 export default function App() {
   const [currentMenu, setCurrentMenu] = useState('main')
@@ -40,16 +41,78 @@ export default function App() {
   const W = 550, H = 380
   const cx = W / 2, cy = H / 2
 
+  const [progress, setProgress] = useState(0)
+  const [appReady, setAppReady] = useState(false)
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const img = new Image()
+    img.src = backgroundImage
+
+    const forceShow = setTimeout(() => {
+      if (isMounted) setAppReady(true);
+    }, 5000);
+
+    const timer = setInterval(() => {
+      setProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(timer)
+          return 100
+        }
+        const increment = prev > 90 ? 1 : Math.floor(Math.random() * 10 + 2);
+        return prev + increment
+      })
+    }, 100)
+
+    img.onload = () => {
+      const checkInterval = setInterval(() => {
+        if (progress >= 100) {
+          clearInterval(checkInterval);
+          clearTimeout(forceShow);
+          if (isMounted) setAppReady(true);
+        }
+      }, 100);
+    }
+
+    img.onerror = () => {
+      console.error("배경 이미지를 불러오지 못했습니다. 경로를 확인해주세요.");
+      setAppReady(true);
+    };
+
+    return () => {
+      isMounted = false;
+      clearInterval(timer);
+      clearTimeout(forceShow);
+    }
+  }, [progress, backgroundImage])
+
   return (
 
     <div className="min-h-screen w-full flex items-center justify-center p-4 pb-[10vh] md:pb-0"
       style={{
-        backgroundColor: '#ffffff',
+        backgroundColor: '#f6f1eb',
         overflow: 'hidden',
         fontFamily: "'Georgia', 'Times New Roman', serif",
         position: 'relative',
       }}
     >
+      <div style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 50,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#ffffff',
+        opacity: appReady ? 0 : 1,
+        visibility: appReady ? 'hidden' : 'visible',
+        transition: 'opacity 0.8s ease-in-out, visibility 0.8s ease-in-out',
+        pointerEvents: appReady ? 'none' : 'auto'
+      }}>
+        <RibbonLoader progress={progress > 100 ? 100 : progress} />
+      </div>
+
       <div style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
         <div style={{
           position: 'absolute', inset: 0,
@@ -58,7 +121,7 @@ export default function App() {
           opacity: 0.4
         }} />
 
-        {/* 2. 핑크-주황 그라데이션 (실크 위에 overlay) */}
+        {/* 2. 핑크-주황 그라데이션 */}
         <div style={{
           position: 'absolute', inset: 0,
           background: 'linear-gradient(135deg, #fde9ff 0%, #ffbff2 50%, #ffffff 100%)',
@@ -134,7 +197,7 @@ export default function App() {
                 d={`M 0 0 L ${cx - 80} ${Math.round(cy * 1.15)} C ${cx - 20} ${Math.round(cy * 1.52)}, ${cx + 20} ${Math.round(cy * 1.52)}, ${cx + 80} ${Math.round(cy * 1.15)} L ${W} 0`}
 
                 fill="#e4ddd3"
-                stroke="#5D4037" // 테두리 색상
+                stroke="#5D4037"
                 strokeWidth="1"
                 strokeOpacity="0.2"
 
