@@ -9,11 +9,10 @@ const TexturePattern = ({ W, H, id, color = "#e0d8cb" }) => {
     const [isTextureReady, setIsTextureReady] = useState(false);
 
     useEffect(() => {
-        // 브라우저 백그라운드에서 이미지를 강제로 로드합니다.
         const img = new Image();
         img.src = wallTexture;
         img.onload = () => {
-            setIsTextureReady(true); // 로드 완료 시 컴포넌트를 다시 렌더링하여 패턴을 입힙니다.
+            setIsTextureReady(true);
         };
     }, []);
 
@@ -61,7 +60,6 @@ export const RightFlap = ({ W, H, cx, cy, color, zIndex }) => (
 
 export const LeftFlap = ({ W, H, cx, cy, color, zIndex }) => (
     <svg className={flapSvgStyle} style={{ zIndex, filter: 'drop-shadow(3px 0 3px rgba(140,100,60,0.09))' }}>
-        {/* [수정 포인트] color 값을 전달합니다 */}
         <TexturePattern W={W} H={H} id="paperTexture-left" color={color} />
         <polygon
             points={`0,0 ${cx},${cy} 0,${H}`}
@@ -122,6 +120,12 @@ export const TopFlap = ({ W, H, cx, cy, color, zIndex, isOpen }) => (
                 className="w-full h-full absolute inset-0"
                 style={{ filter: 'drop-shadow(0 4px 5px rgba(140,100,60,0.12))' }}
             >
+                {/* [수정 포인트 2] 
+                    다른 플랩들과 마찬가지로, <path>를 그리는 SVG 태그 내부로 <TexturePattern>을 이동시킵니다.
+                    이렇게 하면 모바일 브라우저가 화면을 처음 그릴 때 패턴 참조를 절대 놓치지 않습니다.
+                */}
+                <TexturePattern W={W} H={H} id="paperTexture-top" color={color} />
+
                 <path
                     d={`M 0 0 L ${cx - 80} ${Math.round(cy * 1.15)} C ${cx - 20} ${Math.round(cy * 1.52)}, ${cx + 20} ${Math.round(cy * 1.52)}, ${cx + 80} ${Math.round(cy * 1.15)} L ${W} 0`}
                     fill="url(#paperTexture-top)"
