@@ -121,7 +121,7 @@ export default function App() {
       </AnimatePresence>
 
       {/* 2. 배경 레이어 */}
-      <div style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
+      <div style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none', willChange: 'transform', transform: 'translateZ(0)' }}>
         <div style={{
           position: 'absolute', inset: 0,
           backgroundImage: `url(${backgroundImage})`,
@@ -150,12 +150,17 @@ export default function App() {
           perspective: '1200px',
           transformStyle: 'preserve-3d',
           transformOrigin: 'center center',
-          flexShrink: 0
+          flexShrink: 0,
+          WebkitBackfaceVisibility: 'hidden',
+          backfaceVisibility: 'hidden',
         }}
       >
         <div style={{
-          position: 'relative', width: '100%', height: '100%',
-          filter: 'drop-shadow(0 20px 35px rgba(72, 66, 72, 0.4))'
+          position: 'relative',
+          width: '100%',
+          height: '100%',
+          boxShadow: '0 0px 25px rgba(72, 66, 72, 0.5)',
+          borderRadius: '4px',
         }}>
           {/* 봉투 내부 구성 요소 */}
           <div style={{ position: 'relative', width: '100%', height: '100%' }}>
