@@ -180,8 +180,7 @@ export default function App() {
             <RightFlap W={W} H={H} cx={cx} cy={cy} color={COLORS.ENVELOPE_FLAP} zIndex={Z_INDEX.FLAP_RIGHT} />
             <LeftFlap W={W} H={H} cx={cx} cy={cy} color={COLORS.ENVELOPE_FLAP} zIndex={Z_INDEX.FLAP_LEFT} />
             <BottomFlap W={W} H={H} cx={cx} cy={cy} color={COLORS.ENVELOPE_FLAP} zIndex={Z_INDEX.FLAP_BOTTOM} />
-            <TopFlap W={W} cx={cx} cy={cy} color={COLORS.ENVELOPE_FLAP} zIndex={Z_INDEX.FLAP_TOP} isOpen={isOpen} />
-          </div>
+            <TopFlap W={W} H={H} cx={cx} cy={cy} color={COLORS.ENVELOPE_FLAP} zIndex={Z_INDEX.FLAP_TOP} isOpen={isOpen} />          </div>
         </div>
       </motion.div>
     </div>

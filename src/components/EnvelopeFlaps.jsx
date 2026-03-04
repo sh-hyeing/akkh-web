@@ -3,14 +3,13 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import wallTexture from '../assets/wall-texture.jpg';
 
-// 공통 스타일링을 위한 헬퍼 (중복 제거)
 const flapSvgStyle = "absolute inset-0 w-full h-full pointer-events-none";
 
-const TexturePattern = ({ W, H }) => (
+const TexturePattern = ({ W, H, id }) => (
     <defs>
         <pattern
-            id="paperTexture"
-            patternUnits="userSpaceOnUse" // 고정 좌표계 사용
+            id={id}
+            patternUnits="userSpaceOnUse"
             width={W}
             height={H}
         >
@@ -20,7 +19,7 @@ const TexturePattern = ({ W, H }) => (
                 y="0"
                 width={W}
                 height={H}
-                preserveAspectRatio="xMidYMid slice" // 이미지 왜곡 방지하며 꽉 채움
+                preserveAspectRatio="xMidYMid slice"
             />
         </pattern>
     </defs>
@@ -28,10 +27,10 @@ const TexturePattern = ({ W, H }) => (
 
 export const RightFlap = ({ W, H, cx, cy, zIndex }) => (
     <svg className={flapSvgStyle} style={{ zIndex, filter: 'drop-shadow(-1px 0 1px rgba(140,100,60,0.05))' }}>
-        <TexturePattern W={W} H={H} />
+        <TexturePattern W={W} H={H} id="paperTexture-right" />
         <polygon
             points={`${W},0 ${cx},${cy} ${W},${H}`}
-            fill="url(#paperTexture)"
+            fill="url(#paperTexture-right)"
             stroke="#5D4037"
             strokeWidth="1"
             strokeOpacity="0.15"
@@ -41,10 +40,10 @@ export const RightFlap = ({ W, H, cx, cy, zIndex }) => (
 
 export const LeftFlap = ({ W, H, cx, cy, zIndex }) => (
     <svg className={flapSvgStyle} style={{ zIndex, filter: 'drop-shadow(3px 0 3px rgba(140,100,60,0.09))' }}>
-        <TexturePattern W={W} H={H} />
+        <TexturePattern W={W} H={H} id="paperTexture-left" />
         <polygon
             points={`0,0 ${cx},${cy} 0,${H}`}
-            fill="url(#paperTexture)"
+            fill="url(#paperTexture-left)"
             stroke="#5D4037"
             strokeWidth="1"
             strokeOpacity="0.15"
@@ -54,10 +53,10 @@ export const LeftFlap = ({ W, H, cx, cy, zIndex }) => (
 
 export const BottomFlap = ({ W, H, cx, cy, zIndex }) => (
     <svg className={flapSvgStyle} style={{ zIndex, filter: 'drop-shadow(0 -2px 3px rgba(140,100,60,0.11))' }}>
-        <TexturePattern W={W} H={H} />
+        <TexturePattern W={W} H={H} id="paperTexture-bottom" />
         <polygon
             points={`0,${H} ${cx},${cy} ${W},${H}`}
-            fill="url(#paperTexture)"
+            fill="url(#paperTexture-bottom)"
             stroke="#5D4037"
             strokeWidth="1"
             strokeOpacity="0.15"
@@ -65,38 +64,45 @@ export const BottomFlap = ({ W, H, cx, cy, zIndex }) => (
     </svg>
 );
 
-export const TopFlap = ({ W, H, cx, cy, color, zIndex, isOpen }) => (    /* 수정 전: <div style={{ ... }}> */
-    <motion.div
-        initial={false} // 초기 렌더링 시 애니메이션 방지
-        animate={{
-            rotateX: isOpen ? 165 : 0,
-            zIndex: isOpen ? 19 : zIndex,
-        }}
-        transition={{
-            duration: 0.55,
-            ease: [0.22, 1, 0.36, 1], // 기존 cubic-bezier와 동일
-        }}
-        style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            pointerEvents: 'none',
-            transformOrigin: 'top center',
-            filter: 'drop-shadow(0 4px 5px rgba(140,100,60,0.12))',
-            transformStyle: 'preserve-3d', // 3D 성능 최적화
-        }}
-    >
-        <svg className="w-full h-full absolute inset-0">
-            <TexturePattern W={W} H={H} />
-            <path
-                d={`M 0 0 L ${cx - 80} ${Math.round(cy * 1.15)} C ${cx - 20} ${Math.round(cy * 1.52)}, ${cx + 20} ${Math.round(cy * 1.52)}, ${cx + 80} ${Math.round(cy * 1.15)} L ${W} 0`}
-                fill="url(#paperTexture)"
-                stroke="#5D4037"
-                strokeWidth="1"
-                strokeOpacity="0.2"
-            />
+export const TopFlap = ({ W, H, cx, cy, color, zIndex, isOpen }) => (
+    <>
+        <svg width="0" height="0" className="absolute pointer-events-none">
+            <TexturePattern W={W} H={H} id="paperTexture-top" />
         </svg>
-    </motion.div>
+
+        <motion.div
+            initial={false}
+            animate={{
+                rotateX: isOpen ? 165 : 0,
+                zIndex: isOpen ? 19 : zIndex,
+            }}
+            transition={{
+                duration: 0.55,
+                ease: [0.22, 1, 0.36, 1],
+            }}
+            style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                pointerEvents: 'none',
+                transformOrigin: 'top center',
+                transformStyle: 'preserve-3d',
+            }}
+        >
+            <svg
+                className="w-full h-full absolute inset-0"
+                style={{ filter: 'drop-shadow(0 4px 5px rgba(140,100,60,0.12))' }}
+            >
+                <path
+                    d={`M 0 0 L ${cx - 80} ${Math.round(cy * 1.15)} C ${cx - 20} ${Math.round(cy * 1.52)}, ${cx + 20} ${Math.round(cy * 1.52)}, ${cx + 80} ${Math.round(cy * 1.15)} L ${W} 0`}
+                    fill="url(#paperTexture-top)"
+                    stroke="#5D4037"
+                    strokeWidth="1"
+                    strokeOpacity="0.2"
+                />
+            </svg>
+        </motion.div>
+    </>
 );
