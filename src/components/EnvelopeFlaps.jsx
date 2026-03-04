@@ -52,14 +52,20 @@ export const LeftFlap = ({ W, H, cx, cy, zIndex }) => (
     </svg>
 );
 
-export const BottomFlap = ({ W, H, cx, cy, color, zIndex }) => (
+export const BottomFlap = ({ W, H, cx, cy, zIndex }) => (
     <svg className={flapSvgStyle} style={{ zIndex, filter: 'drop-shadow(0 -2px 3px rgba(140,100,60,0.11))' }}>
-        <polygon points={`0,${H} ${cx},${cy} ${W},${H}`} fill="url(#paperTexture)" stroke="#5D4037" strokeWidth="1" strokeOpacity="0.15" />
+        <TexturePattern W={W} H={H} />
+        <polygon
+            points={`0,${H} ${cx},${cy} ${W},${H}`}
+            fill="url(#paperTexture)"
+            stroke="#5D4037"
+            strokeWidth="1"
+            strokeOpacity="0.15"
+        />
     </svg>
 );
 
-export const TopFlap = ({ W, cx, cy, color, zIndex, isOpen }) => (
-    /* 수정 전: <div style={{ ... }}> */
+export const TopFlap = ({ W, H, cx, cy, color, zIndex, isOpen }) => (    /* 수정 전: <div style={{ ... }}> */
     <motion.div
         initial={false} // 초기 렌더링 시 애니메이션 방지
         animate={{
@@ -83,8 +89,7 @@ export const TopFlap = ({ W, cx, cy, color, zIndex, isOpen }) => (
         }}
     >
         <svg className="w-full h-full absolute inset-0">
-            <TexturePattern /> {/* 1. 패턴 정의 추가 */}
-            {/* 덧씌우기 레이어 삭제하고 질감 하나로 통합 */}
+            <TexturePattern W={W} H={H} />
             <path
                 d={`M 0 0 L ${cx - 80} ${Math.round(cy * 1.15)} C ${cx - 20} ${Math.round(cy * 1.52)}, ${cx + 20} ${Math.round(cy * 1.52)}, ${cx + 80} ${Math.round(cy * 1.15)} L ${W} 0`}
                 fill="url(#paperTexture)"

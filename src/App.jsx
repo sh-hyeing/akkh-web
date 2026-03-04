@@ -17,7 +17,7 @@ export default function App() {
     SPARKLE_INTERVAL: 320,
     LOADER_TIMEOUT: 5000,
     COLORS: {
-      BG_MAIN: '#f6f1eb',
+      BG_MAIN: '#fdf3fc',
       ENVELOPE_BACK: '#ded6cb',
       ENVELOPE_FLAP: '#e4ddd3',
       STROKE: '#5D4037',
@@ -113,7 +113,7 @@ export default function App() {
             style={{
               position: 'fixed', inset: 0, zIndex: Z_INDEX.LOADER,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              backgroundColor: '#ffffff',
+              backgroundColor: '#fdf3fc',
             }}>
             <RibbonLoader progress={progress > 100 ? 100 : progress} />
           </motion.div>
@@ -124,13 +124,12 @@ export default function App() {
       <div style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none', willChange: 'transform', transform: 'translateZ(0)' }}>
         <div style={{
           position: 'absolute', inset: 0,
-          backgroundImage: `url(${backgroundImage})`,
           backgroundSize: 'cover', backgroundPosition: 'center',
           opacity: 0.4
         }} />
         <div style={{
           position: 'absolute', inset: 0,
-          background: 'linear-gradient(135deg, #fde9ff 0%, #ffbff2 50%, #ffffff 100%)',
+          background: '#fdf3fc',
           mixBlendMode: 'overlay', opacity: 0.1
         }} />
       </div>
