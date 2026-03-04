@@ -5,7 +5,6 @@ import wallTexture from '../assets/wall-texture.jpg';
 
 const flapSvgStyle = "absolute inset-0 w-full h-full pointer-events-none";
 
-// [수정 포인트] color 속성을 추가하고, 기본값을 베이지색(#e0d8cb)으로 지정했습니다.
 const TexturePattern = ({ W, H, id, color = "#e0d8cb" }) => (
     <defs>
         <pattern
@@ -18,6 +17,7 @@ const TexturePattern = ({ W, H, id, color = "#e0d8cb" }) => (
 
             <image
                 href={wallTexture}
+                xlinkHref={wallTexture} /* [추가된 코드] 구형 및 모바일 브라우저 호환성 강화 */
                 x="0"
                 y="0"
                 width={W}
@@ -72,7 +72,12 @@ export const BottomFlap = ({ W, H, cx, cy, color, zIndex }) => (
 
 export const TopFlap = ({ W, H, cx, cy, color, zIndex, isOpen }) => (
     <>
-        <svg width="0" height="0" className="absolute pointer-events-none">
+        <svg
+            width="1"
+            height="1"
+            className="absolute pointer-events-none"
+            style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}
+        >
             <TexturePattern W={W} H={H} id="paperTexture-top" color={color} />
         </svg>
 
