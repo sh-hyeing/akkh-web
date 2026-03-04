@@ -131,7 +131,7 @@ export default function App() {
         <div style={{
           position: 'absolute', inset: 0,
           background: 'linear-gradient(135deg, #fde9ff 0%, #ffbff2 50%, #ffffff 100%)',
-          mixBlendMode: 'overlay', opacity: 0.2
+          mixBlendMode: 'overlay', opacity: 0.1
         }} />
       </div>
 
@@ -159,7 +159,7 @@ export default function App() {
           position: 'relative',
           width: '100%',
           height: '100%',
-          boxShadow: '0 0px 25px rgba(72, 66, 72, 0.5)',
+          boxShadow: '0 0px 25px rgba(72, 66, 72, 0.7)',
           borderRadius: '4px',
         }}>
           {/* 봉투 내부 구성 요소 */}

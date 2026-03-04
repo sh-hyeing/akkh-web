@@ -1,25 +1,60 @@
 // components/EnvelopeFlaps.jsx
 import React from 'react';
 import { motion } from 'framer-motion';
+import wallTexture from '../assets/wall-texture.jpg';
 
 // 공통 스타일링을 위한 헬퍼 (중복 제거)
 const flapSvgStyle = "absolute inset-0 w-full h-full pointer-events-none";
 
-export const RightFlap = ({ W, H, cx, cy, color, zIndex }) => (
+const TexturePattern = ({ W, H }) => (
+    <defs>
+        <pattern
+            id="paperTexture"
+            patternUnits="userSpaceOnUse" // 고정 좌표계 사용
+            width={W}
+            height={H}
+        >
+            <image
+                href={wallTexture}
+                x="0"
+                y="0"
+                width={W}
+                height={H}
+                preserveAspectRatio="xMidYMid slice" // 이미지 왜곡 방지하며 꽉 채움
+            />
+        </pattern>
+    </defs>
+);
+
+export const RightFlap = ({ W, H, cx, cy, zIndex }) => (
     <svg className={flapSvgStyle} style={{ zIndex, filter: 'drop-shadow(-1px 0 1px rgba(140,100,60,0.05))' }}>
-        <polygon points={`${W},0 ${cx},${cy} ${W},${H}`} fill={color} stroke="#5D4037" strokeWidth="1" strokeOpacity="0.15" />
+        <TexturePattern W={W} H={H} />
+        <polygon
+            points={`${W},0 ${cx},${cy} ${W},${H}`}
+            fill="url(#paperTexture)"
+            stroke="#5D4037"
+            strokeWidth="1"
+            strokeOpacity="0.15"
+        />
     </svg>
 );
 
-export const LeftFlap = ({ W, H, cx, cy, color, zIndex }) => (
+export const LeftFlap = ({ W, H, cx, cy, zIndex }) => (
     <svg className={flapSvgStyle} style={{ zIndex, filter: 'drop-shadow(3px 0 3px rgba(140,100,60,0.09))' }}>
-        <polygon points={`0,0 ${cx},${cy} 0,${H}`} fill={color} stroke="#5D4037" strokeWidth="1" strokeOpacity="0.15" />
+        <TexturePattern W={W} H={H} />
+        <polygon
+            points={`0,0 ${cx},${cy} 0,${H}`}
+            fill="url(#paperTexture)"
+            stroke="#5D4037"
+            strokeWidth="1"
+            strokeOpacity="0.15"
+        />
     </svg>
 );
 
 export const BottomFlap = ({ W, H, cx, cy, color, zIndex }) => (
     <svg className={flapSvgStyle} style={{ zIndex, filter: 'drop-shadow(0 -2px 3px rgba(140,100,60,0.11))' }}>
-        <polygon points={`0,${H} ${cx},${cy} ${W},${H}`} fill={color} stroke="#5D4037" strokeWidth="1" strokeOpacity="0.15" />
+        <polygon points={`0,${H} ${cx},${cy} ${W},${H}`} fill="url(#paperTexture)" stroke="#5D4037" strokeWidth="1" strokeOpacity="0.15" />
     </svg>
 );
 
@@ -48,14 +83,15 @@ export const TopFlap = ({ W, cx, cy, color, zIndex, isOpen }) => (
         }}
     >
         <svg className="w-full h-full absolute inset-0">
+            <TexturePattern /> {/* 1. 패턴 정의 추가 */}
+            {/* 덧씌우기 레이어 삭제하고 질감 하나로 통합 */}
             <path
                 d={`M 0 0 L ${cx - 80} ${Math.round(cy * 1.15)} C ${cx - 20} ${Math.round(cy * 1.52)}, ${cx + 20} ${Math.round(cy * 1.52)}, ${cx + 80} ${Math.round(cy * 1.15)} L ${W} 0`}
-                fill={color}
+                fill="url(#paperTexture)"
                 stroke="#5D4037"
                 strokeWidth="1"
                 strokeOpacity="0.2"
             />
         </svg>
     </motion.div>
-    /* 수정 후: </motion.div> */
 );
