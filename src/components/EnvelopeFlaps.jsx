@@ -1,34 +1,50 @@
 // components/EnvelopeFlaps.jsx
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import wallTexture from '../assets/wall-texture.jpg';
 
 const flapSvgStyle = "absolute inset-0 w-full h-full pointer-events-none";
 
-const TexturePattern = ({ W, H, id, color = "#e0d8cb" }) => (
-    <defs>
-        <pattern
-            id={id}
-            patternUnits="userSpaceOnUse"
-            width={W}
-            height={H}
-        >
-            <rect width={W} height={H} fill={color} />
+const TexturePattern = ({ W, H, id, color = "#e0d8cb" }) => {
+    const [isTextureReady, setIsTextureReady] = useState(false);
 
-            <image
-                href={wallTexture}
-                xlinkHref={wallTexture} /* [추가된 코드] 구형 및 모바일 브라우저 호환성 강화 */
-                x="0"
-                y="0"
+    useEffect(() => {
+        // 브라우저 백그라운드에서 이미지를 강제로 로드합니다.
+        const img = new Image();
+        img.src = wallTexture;
+        img.onload = () => {
+            setIsTextureReady(true); // 로드 완료 시 컴포넌트를 다시 렌더링하여 패턴을 입힙니다.
+        };
+    }, []);
+
+    return (
+        <defs>
+            <pattern
+                id={id}
+                patternUnits="userSpaceOnUse"
                 width={W}
                 height={H}
-                preserveAspectRatio="xMidYMid slice"
-                opacity="0.65"
-                style={{ mixBlendMode: 'multiply' }}
-            />
-        </pattern>
-    </defs>
-);
+            >
+
+                <rect width={W} height={H} fill={color} />
+
+                {isTextureReady && (
+                    <image
+                        href={wallTexture}
+                        xlinkHref={wallTexture}
+                        x="0"
+                        y="0"
+                        width={W}
+                        height={H}
+                        preserveAspectRatio="xMidYMid slice"
+                        opacity="0.65"
+                        style={{ mixBlendMode: 'multiply' }}
+                    />
+                )}
+            </pattern>
+        </defs>
+    );
+};
 
 export const RightFlap = ({ W, H, cx, cy, color, zIndex }) => (
     <svg className={flapSvgStyle} style={{ zIndex, filter: 'drop-shadow(-1px 0 1px rgba(140,100,60,0.05))' }}>

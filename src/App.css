@@ -42,12 +42,6 @@ a,
 }
 
 @media (max-width: 768px) {
-  .letter-container {
-    width: 96%;
-    height: 85vh;
-    left: 2%;
-    top: 2vh;
-  }
 
   .letter-container.is-open {
     --letter-transform: translate3d(0, -50px, 0) scale(1);
