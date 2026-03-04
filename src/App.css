@@ -24,4 +24,32 @@ body {
   overflow: hidden;
   overscroll-behavior: none;
   position: fixed;
+  touch-action: pan-y;
+}
+
+button,
+a,
+.flap-element {
+  touch-action: manipulation;
+}
+
+.letter-container {
+  width: 86%;
+  height: 600px;
+  left: 7%;
+  top: 0;
+  transform: var(--letter-transform);
+}
+
+@media (max-width: 768px) {
+  .letter-container {
+    width: 96%;
+    height: 85vh;
+    left: 2%;
+    top: 2vh;
+  }
+
+  .letter-container.is-open {
+    --letter-transform: translate3d(0, -50px, 0) scale(1);
+  }
 }

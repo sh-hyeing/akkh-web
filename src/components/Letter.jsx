@@ -36,19 +36,24 @@ export default function Letter({ isOpen, messages, onAddMessage, onDeleteMessage
 
     return (
         <>
-            <div style={{
-                position: 'absolute',
-                width: '86%', height: '600px', left: '7%', top: 0,
-                transform: isOpen ? 'translate3d(0, -115px, 0) scale(1.04)' : 'translate3d(0, 65px, 0) scale(0.88)',
-                zIndex: isOpen ? 100 : 5,
-                opacity: isOpen ? 1 : 0,
-                visibility: isOpen ? 'visible' : 'hidden',
-                transition: 'transform 0.6s cubic-bezier(0.22,1,0.36,1), opacity 0.4s ease-out',
-                background: '#fdfaf3',
-                display: 'flex', flexDirection: 'column',
-                padding: '24px 28px',
-                border: '1px solid rgba(200,178,148,0.4)',
-            }}>
+            <div
+                className={`letter-container ${isOpen ? 'is-open' : 'is-closed'}`}
+                style={{
+                    position: 'absolute',
+
+                    '--letter-transform': isOpen ? 'translate3d(0, -115px, 0) scale(1.04)' : 'translate3d(0, 65px, 0) scale(0.88)',
+
+                    zIndex: isOpen ? 100 : 5,
+                    opacity: isOpen ? 1 : 0,
+                    visibility: isOpen ? 'visible' : 'hidden',
+                    transition: 'transform 0.6s cubic-bezier(0.22,1,0.36,1), opacity 0.4s ease-out, width 0.3s, height 0.3s, left 0.3s, top 0.3s', // 크기 변화 애니메이션 추가
+                    background: '#ffffff',
+                    display: 'flex', flexDirection: 'column',
+                    padding: '24px 28px',
+                    border: '1px solid rgba(200,178,148,0.5)',
+                    boxShadow: '0 0px 25px rgba(72, 66, 72, 0.6)',
+                }}
+            >
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '5px', marginBottom: '6px' }}>
                     <Bud size={12} opacity={0.55} /><Rose size={18} opacity={0.65} /><Bud size={14} opacity={0.6} /><Rose size={22} opacity={0.72} /><Bud size={14} opacity={0.6} /><Rose size={18} opacity={0.65} /><Bud size={12} opacity={0.55} />
                 </div>

@@ -17,9 +17,9 @@ export default function App() {
     SPARKLE_INTERVAL: 320,
     LOADER_TIMEOUT: 5000,
     COLORS: {
-      BG_MAIN: '#fdf3fc',
-      ENVELOPE_BACK: '#ded6cb',
-      ENVELOPE_FLAP: '#e4ddd3',
+      BG_MAIN: '#ffffff',
+      ENVELOPE_BACK: '#e6dfd5',
+      ENVELOPE_FLAP: '#fffcf5',
       STROKE: '#5D4037',
       SHADOW: 'rgba(140, 100, 60, 0.20)',
     },
@@ -120,19 +120,6 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {/* 2. 배경 레이어 */}
-      <div style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none', willChange: 'transform', transform: 'translateZ(0)' }}>
-        <div style={{
-          position: 'absolute', inset: 0,
-          backgroundSize: 'cover', backgroundPosition: 'center',
-          opacity: 0.4
-        }} />
-        <div style={{
-          position: 'absolute', inset: 0,
-          background: '#fdf3fc',
-          mixBlendMode: 'overlay', opacity: 0.1
-        }} />
-      </div>
 
       {/* 3. 메인 봉투 (Framer Motion 적용) */}
       <motion.div
@@ -158,7 +145,7 @@ export default function App() {
           position: 'relative',
           width: '100%',
           height: '100%',
-          boxShadow: '0 0px 25px rgba(72, 66, 72, 0.7)',
+          boxShadow: '0 0px 25px rgba(72, 66, 72, 0.6)',
           borderRadius: '4px',
         }}>
           {/* 봉투 내부 구성 요소 */}

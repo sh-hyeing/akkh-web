@@ -5,7 +5,8 @@ import wallTexture from '../assets/wall-texture.jpg';
 
 const flapSvgStyle = "absolute inset-0 w-full h-full pointer-events-none";
 
-const TexturePattern = ({ W, H, id }) => (
+// [수정 포인트] color 속성을 추가하고, 기본값을 베이지색(#e0d8cb)으로 지정했습니다.
+const TexturePattern = ({ W, H, id, color = "#e0d8cb" }) => (
     <defs>
         <pattern
             id={id}
@@ -13,6 +14,8 @@ const TexturePattern = ({ W, H, id }) => (
             width={W}
             height={H}
         >
+            <rect width={W} height={H} fill={color} />
+
             <image
                 href={wallTexture}
                 x="0"
@@ -20,14 +23,16 @@ const TexturePattern = ({ W, H, id }) => (
                 width={W}
                 height={H}
                 preserveAspectRatio="xMidYMid slice"
+                opacity="0.65"
+                style={{ mixBlendMode: 'multiply' }}
             />
         </pattern>
     </defs>
 );
 
-export const RightFlap = ({ W, H, cx, cy, zIndex }) => (
+export const RightFlap = ({ W, H, cx, cy, color, zIndex }) => (
     <svg className={flapSvgStyle} style={{ zIndex, filter: 'drop-shadow(-1px 0 1px rgba(140,100,60,0.05))' }}>
-        <TexturePattern W={W} H={H} id="paperTexture-right" />
+        <TexturePattern W={W} H={H} id="paperTexture-right" color={color} />
         <polygon
             points={`${W},0 ${cx},${cy} ${W},${H}`}
             fill="url(#paperTexture-right)"
@@ -38,9 +43,10 @@ export const RightFlap = ({ W, H, cx, cy, zIndex }) => (
     </svg>
 );
 
-export const LeftFlap = ({ W, H, cx, cy, zIndex }) => (
+export const LeftFlap = ({ W, H, cx, cy, color, zIndex }) => (
     <svg className={flapSvgStyle} style={{ zIndex, filter: 'drop-shadow(3px 0 3px rgba(140,100,60,0.09))' }}>
-        <TexturePattern W={W} H={H} id="paperTexture-left" />
+        {/* [수정 포인트] color 값을 전달합니다 */}
+        <TexturePattern W={W} H={H} id="paperTexture-left" color={color} />
         <polygon
             points={`0,0 ${cx},${cy} 0,${H}`}
             fill="url(#paperTexture-left)"
@@ -51,9 +57,9 @@ export const LeftFlap = ({ W, H, cx, cy, zIndex }) => (
     </svg>
 );
 
-export const BottomFlap = ({ W, H, cx, cy, zIndex }) => (
+export const BottomFlap = ({ W, H, cx, cy, color, zIndex }) => (
     <svg className={flapSvgStyle} style={{ zIndex, filter: 'drop-shadow(0 -2px 3px rgba(140,100,60,0.11))' }}>
-        <TexturePattern W={W} H={H} id="paperTexture-bottom" />
+        <TexturePattern W={W} H={H} id="paperTexture-bottom" color={color} />
         <polygon
             points={`0,${H} ${cx},${cy} ${W},${H}`}
             fill="url(#paperTexture-bottom)"
@@ -67,7 +73,7 @@ export const BottomFlap = ({ W, H, cx, cy, zIndex }) => (
 export const TopFlap = ({ W, H, cx, cy, color, zIndex, isOpen }) => (
     <>
         <svg width="0" height="0" className="absolute pointer-events-none">
-            <TexturePattern W={W} H={H} id="paperTexture-top" />
+            <TexturePattern W={W} H={H} id="paperTexture-top" color={color} />
         </svg>
 
         <motion.div
