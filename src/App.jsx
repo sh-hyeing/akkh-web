@@ -146,7 +146,9 @@ export default function App() {
      backfaceVisibility: "hidden",
     }}
    >
-    <div
+    <motion.div
+     animate={isOpen ? { y: 0 } : { y: [0, -15, 0] }}
+     transition={isOpen ? { type: "spring", stiffness: 400, damping: 25 } : { duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
      style={{
       position: "relative",
       width: "100%",
@@ -171,7 +173,7 @@ export default function App() {
       <BottomFlap W={W} H={H} cx={cx} cy={cy} color={COLORS.ENVELOPE_FLAP} zIndex={Z_INDEX.FLAP_BOTTOM} />
       <TopFlap W={W} H={H} cx={cx} cy={cy} color={COLORS.ENVELOPE_FLAP} zIndex={Z_INDEX.FLAP_TOP} isOpen={isOpen} />{" "}
      </div>
-    </div>
+    </motion.div>
    </motion.div>
   </div>
  );

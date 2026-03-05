@@ -22,22 +22,22 @@ export default function Letter({ isOpen, messages, onAddMessage, onDeleteMessage
  const samples = [
   {
    id: 1,
-   src: "https://static.wikia.nocookie.net/projectsekai/images/f/f7/Unyielding_Resolve_T.png/revision/latest/scale-to-width-down/1000?cb=20240109064604",
+   src: "https://mdl.artvee.com/sftb/906162il.jpg",
    title: "1",
   },
   {
    id: 2,
-   src: "https://static.wikia.nocookie.net/projectsekai/images/f/f5/Into_An_Exciting_Future_T.png/revision/latest/scale-to-width-down/1000?cb=20240109064457",
+   src: "https://mdl.artvee.com/sftb/929981il.jpg",
    title: "2",
   },
   {
    id: 3,
-   src: "https://static.wikia.nocookie.net/projectsekai/images/4/4b/White-Hot_Snowball_Fight%21_T.png/revision/latest/scale-to-width-down/1000?cb=20241221111417",
+   src: "https://mdl.artvee.com/sftb/229177fg.jpg",
    title: "3",
   },
   {
    id: 4,
-   src: "https://static.wikia.nocookie.net/projectsekai/images/5/55/Can%27t_Wait_For_The_Show_T.png/revision/latest/scale-to-width-down/1000?cb=20241221030148",
+   src: "https://mdl.artvee.com/sftb/14125po.jpg",
    title: "4",
   },
  ];
@@ -83,7 +83,7 @@ export default function Letter({ isOpen, messages, onAddMessage, onDeleteMessage
     </div>
 
     <div className="flex justify-between items-center mb-2 pb-1">
-     <span style={{ color: "#b09070", fontSize: "10px", fontWeight: "bold", letterSpacing: "4px" }}>AKKH</span>
+     <span style={{ color: "#b09070", fontSize: "10px", fontWeight: "bold", letterSpacing: "4px" }}>TITLE</span>
      <div style={{ display: "flex", gap: "4px", alignItems: "center" }}>
       <span style={{ fontSize: "14px", opacity: 0.6 }}>✉</span>
      </div>
